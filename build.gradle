@@ -1,0 +1,73 @@
+buildscript {
+	ext {
+		springBootVersion = '1.5.6.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+jar {
+	baseName = 'myRetail'
+}
+
+springBoot {
+	executable = true
+}
+
+repositories {
+	mavenCentral()
+}
+
+sourceSets {
+	'int' {
+		java {
+			compileClasspath += main.output + test.output
+			runtimeClasspath += main.output + test.output
+			srcDir file('src/int/java')
+		}
+		resources.srcDir file('src/int/resources')
+	}
+}
+
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter')
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.springframework.boot:spring-boot-starter-aop')
+	compile('org.springframework.boot:spring-boot-starter-cache')
+	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+	compile('org.springframework.boot:spring-boot-starter-data-rest')
+	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.springframework.boot:spring-boot-starter-jersey')
+	compile('org.apache.commons:commons-lang3:3.4')
+	testCompile('org.jmockit:jmockit:1.24')
+	testCompile("junit:junit:4.12")
+	testCompile("org.mockito:mockito-core:1.10.19")
+	testCompile('de.flapdoodle.embed:de.flapdoodle.embed.mongo:2.0.0')
+}
+
+task integrationTest(type: Test) {
+	testClassesDir = sourceSets.int.output.classesDir
+	classpath = sourceSets.int.runtimeClasspath
+	outputs.upToDateWhen { false }
+}
+
+configurations {
+	intCompile.extendsFrom testCompile
+	intRuntime.extendsFrom testRuntime
+}
+
+integrationTest.mustRunAfter test
